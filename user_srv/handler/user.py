@@ -15,12 +15,11 @@ class UserServicer(user_pb2_grpc.UserServicer):
         rsp.total = users.count()
 
         start = 0
-        page = 1
         per_page_nums = 10
         if request.pSize:
             per_page_nums = request.pSize
         if request.pn:
-            start = per_page_nums * (page - 1)
+            start = per_page_nums * (request.pn - 1)
 
         users = users.limit(per_page_nums).offset(start)
 
