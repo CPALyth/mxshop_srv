@@ -1,5 +1,6 @@
 grpcio==1.41.1
 grpcio-tools==1.41.1
+loguru==0.5.3
 passlib==1.7.4
 peewee==3.14.8
 protobuf==3.19.1
