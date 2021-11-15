@@ -1,0 +1,7 @@
+grpcio==1.41.1
+grpcio-tools==1.41.1
+passlib==1.7.4
+peewee==3.14.8
+protobuf==3.19.1
+PyMySQL==1.0.2
+six==1.16.0

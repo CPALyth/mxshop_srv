@@ -11,7 +11,6 @@ class BaseModel(Model):
 class User(BaseModel):
     # db值, py值
     GENDER_CHOICES = (
-
         ("female", "女"),
         ("male", "男")
     )
@@ -31,4 +30,9 @@ class User(BaseModel):
 
 
 if __name__ == '__main__':
-        db.create_tables([User])
+    db.create_tables([User])
+    from passlib.hash import pbkdf2_sha256
+    hash = pbkdf2_sha256.hash("123456")
+    print(hash)
+    print(pbkdf2_sha256.verify('123456', hash))  # True
+    print(pbkdf2_sha256.verify('1234567', hash))  # False
