@@ -2,6 +2,7 @@ import time
 
 import grpc
 from loguru import logger
+from passlib.hash import pbkdf2_sha256
 
 from ..model.models import User
 from ..proto import user_pb2, user_pb2_grpc
@@ -60,4 +61,21 @@ class UserServicer(user_pb2_grpc.UserServicer):
             context.set_code(grpc.StatusCode.NOT_FOUND)
             context.set_details('用户不存在')
             return user_pb2
+        return self.convert_user_to_rsp(user)
+
+    @logger.catch
+    def CreateUser(self, request: user_pb2.CreateUserInfo, context):
+        """新建用户"""
+        user = User.get_or_none(User.mobile == request.mobile)
+        if user:
+            context.set_code(grpc.StatusCode.ALREADY_EXISTS)
+            context.set_details('用户已存在')
+            return user_pb2.UserInfoResponse()
+        user = User(
+            nick_name=request.nickName,
+            mobile=request.mobile,
+            password=pbkdf2_sha256.hash(request.password),
+        )
+        user.save()
+
         return self.convert_user_to_rsp(user)
