@@ -6,7 +6,7 @@ class ReconnectMysqlDatabase(ReconnectMixin, PooledMySQLDatabase):
     pass
 
 
-MYSQL_DB = "mxshop_usr_srv"
+MYSQL_DB = "mxshop_user_srv"
 MYSQL_HOST = "192.168.1.103"
 MYSQL_PORT = 3306
 MYSQL_USER = "ws"
