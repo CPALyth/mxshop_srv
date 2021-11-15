@@ -32,7 +32,16 @@ class User(BaseModel):
 if __name__ == '__main__':
     db.create_tables([User])
     from passlib.hash import pbkdf2_sha256
-    hash = pbkdf2_sha256.hash("123456")
-    print(hash)
-    print(pbkdf2_sha256.verify('123456', hash))  # True
-    print(pbkdf2_sha256.verify('1234567', hash))  # False
+    # for i in range(10):
+    #     user = User()
+    #     user.nick_name = f"bobby{i}"
+    #     user.mobile = f"1512345000{i}"
+    #     user.password = pbkdf2_sha256.hash("admin123")
+    #     user.save()
+
+    for user in User.select():
+        import time
+        if user.birthday:
+            print(user.birthday)
+            user.birthday = int(time.mktime(user.birthday.timetuple()))
+            print(user.birthday)
