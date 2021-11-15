@@ -1,8 +1,10 @@
 import time
+from datetime import date
 
 import grpc
 from loguru import logger
 from passlib.hash import pbkdf2_sha256
+from google.protobuf import empty_pb2
 
 from ..model.models import User
 from ..proto import user_pb2, user_pb2_grpc
@@ -60,7 +62,7 @@ class UserServicer(user_pb2_grpc.UserServicer):
         if not user:
             context.set_code(grpc.StatusCode.NOT_FOUND)
             context.set_details('用户不存在')
-            return user_pb2
+            return user_pb2.UserInfoResponse()
         return self.convert_user_to_rsp(user)
 
     @logger.catch
@@ -77,5 +79,18 @@ class UserServicer(user_pb2_grpc.UserServicer):
             password=pbkdf2_sha256.hash(request.password),
         )
         user.save()
-
         return self.convert_user_to_rsp(user)
+
+    @logger.catch
+    def UpdateUser(self, request: user_pb2.UpdateUserInfo, context):
+        """更新用户"""
+        user = User.get(User.id == request.id)
+        if not user:
+            context.set_code(grpc.StatusCode.NOT_FOUND)
+            context.set_details('用户不存在')
+            return user_pb2.UserInfoResponse()
+        user.nick_name = request.nickName
+        user.gender = request.gender
+        user.birthday = date.fromtimestamp(request.birthDay)
+        user.save()
+        return empty_pb2.Empty()
