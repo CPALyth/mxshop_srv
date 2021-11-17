@@ -34,6 +34,7 @@ class UserServicer(user_pb2_grpc.UserServicer):
 
     @logger.catch
     def GetUserList(self, request: user_pb2.PageInfo, context):
+        logger.info("GetUserList")
         # 获取用户的列表
         rsp = user_pb2.UserListResponse()
 
