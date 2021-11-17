@@ -59,6 +59,7 @@ class UserServicer(user_pb2_grpc.UserServicer):
     @logger.catch
     def GetUserById(self, request: user_pb2.IdRequest, context):
         """通过ID查询用户"""
+        logger.info("GetUserById")
         user = User.get_or_none(User.id == request.id)
         if not user:
             context.set_code(grpc.StatusCode.NOT_FOUND)
@@ -67,8 +68,19 @@ class UserServicer(user_pb2_grpc.UserServicer):
         return self.convert_user_to_rsp(user)
 
     @logger.catch
+    def GetUserByMobile(self, request: user_pb2.MobileRequest, context):
+        """通过手机号查询用户"""
+        logger.info("GetUserByMobile")
+        user = User.get_or_none(User.mobile == request.mobile)
+        if not user:
+            context.set_code(grpc.StatusCode.NOT_FOUND)
+            context.set_details('用户不存在')
+        return self.convert_user_to_rsp(user)
+
+    @logger.catch
     def CreateUser(self, request: user_pb2.CreateUserInfo, context):
         """新建用户"""
+        logger.info("CreateUser")
         user = User.get_or_none(User.mobile == request.mobile)
         if user:
             context.set_code(grpc.StatusCode.ALREADY_EXISTS)
@@ -85,6 +97,7 @@ class UserServicer(user_pb2_grpc.UserServicer):
     @logger.catch
     def UpdateUser(self, request: user_pb2.UpdateUserInfo, context):
         """更新用户"""
+        logger.info("UpdateUser")
         user = User.get(User.id == request.id)
         if not user:
             context.set_code(grpc.StatusCode.NOT_FOUND)
@@ -95,3 +108,9 @@ class UserServicer(user_pb2_grpc.UserServicer):
         user.birthday = date.fromtimestamp(request.birthDay)
         user.save()
         return empty_pb2.Empty()
+
+    @logger.catch
+    def CheckPassword(self, request: user_pb2.UpdateUserInfo, context):
+        """检查密码"""
+        logger.info("CheckPassword")
+        return user_pb2.CheckResponse(success=pbkdf2_sha256.verify(request.password, request.encryptedPassword))
