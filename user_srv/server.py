@@ -6,10 +6,13 @@ import grpc
 from loguru import logger
 import signal
 
+from common.register import consul
 from user_srv.proto import user_pb2_grpc
 from user_srv.handler.user import UserServicer
 from common.grpc_health.v1 import health_pb2_grpc, health_pb2
 from common.grpc_health.v1.health import HealthServicer
+from user_srv.settings import settings
+
 
 def on_exit(signo, frame):
     logger.info("进程中断")
@@ -39,4 +42,13 @@ if __name__ == '__main__':
 
     logger.info(f'启动服务 {args.ip}:{args.port}')
     server.start()
+
+    # 注册服务
+    register = consul.ConsulRegister(settings.CONSUL_HOST, settings.CONSUL_PORT)
+    if not register.register(name=settings.SERVICE_NAME, id=settings.SERVICE_NAME,
+                      address=args.ip, port=args.port, tags=settings.SERVICE_TAGS):
+        logger.info("服务注册失败")
+        sys.exit(0)
+
+    logger.info("服务注册成功")
     server.wait_for_termination()
