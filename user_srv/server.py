@@ -8,7 +8,8 @@ import signal
 
 from user_srv.proto import user_pb2_grpc
 from user_srv.handler.user import UserServicer
-
+from common.grpc_health.v1 import health_pb2_grpc, health_pb2
+from common.grpc_health.v1.health import HealthServicer
 
 def on_exit(signo, frame):
     logger.info("进程中断")
@@ -17,14 +18,19 @@ def on_exit(signo, frame):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--ip', type=str, default='127.0.0.1', help='binding ip')
+    parser.add_argument('--ip', type=str, default='192.168.1.103', help='binding ip')
     parser.add_argument('--port', type=int, default=50051, help='listening port')
     args = parser.parse_args()
 
     logger.add('logs/user_srv_{time}.log')
 
     server = grpc.server(futures.ThreadPoolExecutor(max_workers =10))
+
+    # 注册用户服务
     user_pb2_grpc.add_UserServicer_to_server(UserServicer(), server)
+    # 注册健康检查
+    health_pb2_grpc.add_HealthServicer_to_server(HealthServicer(), server)
+
     server.add_insecure_port(f'{args.ip}:{args.port}')
 
     # 主进程退出信号监听
