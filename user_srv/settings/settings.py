@@ -15,7 +15,7 @@ MYSQL_PASSWORD = "123456"
 CONSUL_HOST = "192.168.1.103"
 CONSUL_PORT = 8500
 
-SERVICE_NAME = "user_srv2"
+SERVICE_NAME = "user_srv"
 SERVICE_TAGS = ["python"]
 
 DB = ReconnectMysqlDatabase(MYSQL_DB, host=MYSQL_HOST, port=MYSQL_PORT,
